@@ -14,7 +14,8 @@ Practice for C skills, and developing GitHub profile.
     - Created `repl.c` and compiled
     - Created `prompt.c` and compiled
     - Created `prompt2.c` and compiled
-- [ ] Chapter 5 
+- [x] Chapter 5 
+    - Created notes locally
 - [ ] Chapter 6 
 - [ ] Chapter 7 
 - [ ] Chapter 8 
