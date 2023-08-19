@@ -10,7 +10,10 @@ Practice for C skills, and developing GitHub profile.
     - Created `hello_world.c` and compiled
 - [x] Chapter 3 
     - Created notes locally
-- [ ] Chapter 4 
+- [x] Chapter 4 
+    - Created `repl.c` and compiled
+    - Created `prompt.c` and compiled
+    - Created `prompt2.c` and compiled
 - [ ] Chapter 5 
 - [ ] Chapter 6 
 - [ ] Chapter 7 
