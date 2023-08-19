@@ -8,7 +8,8 @@ Practice for C skills, and developing GitHub profile.
     - Created notes locally 
 - [x] Chapter 2 
     - Created `hello_world.c` and compiled
-- [ ] Chapter 3 
+- [x] Chapter 3 
+    - Created notes locally
 - [ ] Chapter 4 
 - [ ] Chapter 5 
 - [ ] Chapter 6 
