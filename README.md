@@ -16,7 +16,8 @@ Practice for C skills, and developing GitHub profile.
     - Created `prompt2.c` and compiled
 - [x] Chapter 5 
     - Created notes locally
-- [ ] Chapter 6 
+- [x] Chapter 6 
+    - Created `parsing.c` and compiled
 - [ ] Chapter 7 
 - [ ] Chapter 8 
 - [ ] Chapter 9 
