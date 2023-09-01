@@ -18,7 +18,8 @@ Practice for C skills, and developing GitHub profile.
     - Created notes locally
 - [x] Chapter 6 
     - Created `parsing.c` and compiled
-- [ ] Chapter 7 
+- [x] Chapter 7 
+    - Created `evaluation.c`,`evaluation2.c` and compiled
 - [ ] Chapter 8 
 - [ ] Chapter 9 
 - [ ] Chapter 10
