@@ -67,18 +67,6 @@ lval* lval_sexpr(void) {
     return v;
 }
 
-void lval_print(lval v) {
-    switch (v.type) {
-        case LVAL_NUM: printf("%f", v.num); break;
-
-        case LVAL_ERR:
-            if (v.err == LERR_DIV_ZERO) { printf("Error: Division by zero!");}
-            if (v.err == LERR_BAD_OP) { printf("Error: Invalid Operator!");}
-            if (v.err == LERR_BAD_NUM) { printf("Error: Invalid Number!");}
-            break;
-    }
-}
-
 void lval_del(lval* v) {
     switch (v->type) {
         case LVAL_NUM: break;
@@ -94,9 +82,16 @@ void lval_del(lval* v) {
     free(v);
 }
 
+lval* lval_add(lval* v, lval* x) {
+    v->count++;
+    v->cell = realloc(v->cell, sizeof(lval*) * v->count);
+    v->cell[v->count-1] = x;
+    return v;
+}
+
 lval* lval_read_num(mpc_ast_t* t) {
     errno = 0;
-    long x = strol(t->contents, NULL, 10);
+    long x = strtol(t->contents, NULL, 10);
     return errno != ERANGE ?
         lval_num(x) : lval_err("invalid number");
 }
@@ -105,8 +100,8 @@ lval* lval_read(mpc_ast_t* t) {
     if (strstr(t->tag, "number")) { return lval_read_num(t); }
     if (strstr(t->tag, "symbol")) { return lval_sym(t->contents); }
     lval* x = NULL;
-    if (strcmp(t->tap, ">") == 0) { x = lval_sexpr(); }
-    if (strcmp(t->tap, "sexpr")) { x = lval_sexpr(); }
+    if (strcmp(t->tag, ">") == 0) { x = lval_sexpr(); }
+    if (strcmp(t->tag, "sexpr")) { x = lval_sexpr(); }
     for (int i=0; i < t->children_num; i++) {
         if (strcmp(t->children[i]->contents, "(") == 0) { continue; }
         if (strcmp(t->children[i]->contents, ")") == 0) { continue; }
@@ -114,13 +109,6 @@ lval* lval_read(mpc_ast_t* t) {
         x = lval_add(x, lval_read(t->children[i]));
     }
     return x;
-}
-
-lval* lval_add(lval* v, lval* x) {
-    v->count++;
-    v->cell = realloc(v->cell, sizeof(lval*) * v->count);
-    v->cell[v->count-1] = x;
-    return v;
 }
 
 void lval_expr_print(lval* v, char open, char close) {
@@ -145,41 +133,41 @@ void lval_print(lval* v) {
 
 void lval_println(lval* v) { lval_print(v); putchar('\n'); }
 
-lval eval_op(lval x, char* op, lval y) {
-    if (x.type == LVAL_ERR) { return x; }
-    if (y.type == LVAL_ERR) { return y; }
-
-    if (strcmp(op,"+") == 0){ return lval_num(x.num + y.num); }
-    if (strcmp(op,"-") == 0){ return lval_num(x.num - y.num); }
-    if (strcmp(op,"*") == 0){ return lval_num(x.num * y.num); }
-    if (strcmp(op,"/") == 0){ return y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num); }
-    if (strcmp(op,"%") == 0){ double i = x.num; while (i >= y.num) {i -= y.num;}; return lval_num(i); }
-    if (strcmp(op,"^") == 0){ return lval_num(pow(x.num,y.num)); }
-    if (strcmp(op,"min") == 0){ if (x.num < y.num ) { return lval_num(x.num);} return lval_num(y.num); }
-    if (strcmp(op,"max") == 0){ if (x.num  > y.num ) { return lval_num(x.num);}  return lval_num(y.num); }
-    return lval_err(LERR_BAD_OP);
-}
-
-lval eval(mpc_ast_t* t) {
-    
-    if (strstr(t->tag, "number")) {
-        errno = 0;
-        double x = strtod(t->contents, NULL);
-        return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
-    }
-
-    char* op = t->children[1]->contents;
-    lval x = eval( t->children[2] );
-
-    int i = 3;
-    if ((strstr(t->children[3]->tag, "number") == 0) && ( strcmp(op,"-") == 0 )) { return lval_num(x.num  * -1); }
-    while (strstr(t->children[i]->tag, "expr")) {
-        x = eval_op(x, op, eval(t->children[i]));
-        i++;
-    }
-
-    return x;
-}
+//lval eval_op(lval x, char* op, lval y) {
+//    if (x.type == LVAL_ERR) { return x; }
+//    if (y.type == LVAL_ERR) { return y; }
+//
+//    if (strcmp(op,"+") == 0){ return lval_num(x.num + y.num); }
+//    if (strcmp(op,"-") == 0){ return lval_num(x.num - y.num); }
+//    if (strcmp(op,"*") == 0){ return lval_num(x.num * y.num); }
+//    if (strcmp(op,"/") == 0){ return y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num); }
+//    if (strcmp(op,"%") == 0){ double i = x.num; while (i >= y.num) {i -= y.num;}; return lval_num(i); }
+//    if (strcmp(op,"^") == 0){ return lval_num(pow(x.num,y.num)); }
+//    if (strcmp(op,"min") == 0){ if (x.num < y.num ) { return lval_num(x.num);} return lval_num(y.num); }
+//    if (strcmp(op,"max") == 0){ if (x.num  > y.num ) { return lval_num(x.num);}  return lval_num(y.num); }
+//    return lval_err(LERR_BAD_OP);
+//}
+//
+//lval eval(mpc_ast_t* t) {
+//    
+//    if (strstr(t->tag, "number")) {
+//        errno = 0;
+//        double x = strtod(t->contents, NULL);
+//        return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
+//    }
+//
+//    char* op = t->children[1]->contents;
+//    lval x = eval( t->children[2] );
+//
+//    int i = 3;
+//    if ((strstr(t->children[3]->tag, "number") == 0) && ( strcmp(op,"-") == 0 )) { return lval_num(x.num  * -1); }
+//    while (strstr(t->children[i]->tag, "expr")) {
+//        x = eval_op(x, op, eval(t->children[i]));
+//        i++;
+//    }
+//
+//    return x;
+//}
 
 int main(int argc, char** argv)
 {
@@ -195,10 +183,11 @@ int main(int argc, char** argv)
       "                                                               \
         number   : /-?[0-9]+(\\.?[0-9]*)?/ ;                          \
         symbol   : '+' | '-' | '*' | '/' | '%' | \"min\" | \"max\" ;  \
-        expr     : <number> | '(' <operator> <expr>+ ')' ;            \
-        lispy    : /^/ <operator> <expr>+ /$/ ;                       \
+        sexpr    : '(' <expr>* ')' ;                                  \
+        expr     : <number> | <symbol> | <sexpr> ;                    \
+        lispy    : /^/  <expr>* /$/ ;                       \
       ",
-    Number, Operator, Expr, Lispy);
+    Number, Symbol, Sexpr, Expr, Lispy);
 
     puts("Lispy Version 0.0.0.0.4");
     puts("Press Ctrl+C to exit\n");
@@ -208,8 +197,9 @@ int main(int argc, char** argv)
         add_history(input);
         mpc_result_t r;
         if (mpc_parse("<stdin>", input, Lispy, &r)) {
-            lval result = eval(r.output);
+            lval* result = lval_read(r.output);
             lval_println(result);
+            lval_del(result);
             mpc_ast_delete(r.output);
         } else {
             mpc_err_print(r.error);
