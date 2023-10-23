@@ -29,7 +29,7 @@ enum {LVAL_NUM, LVAL_ERR, LVAL_SYM, LVAL_SEXPR};
 
 typedef struct lval{
     int type;
-    long num;
+    float num;
     char* err;
     char* sym;
     int count;
@@ -94,7 +94,7 @@ lval* lval_add(lval* v, lval* x) {
 
 lval* lval_read_num(mpc_ast_t* t) {
     errno = 0;
-    long x = strtol(t->contents, NULL, 10);
+    float x = strtof(t->contents, NULL);
     return errno != ERANGE ?
         lval_num(x) : lval_err("invalid number");
 }
@@ -127,7 +127,7 @@ void lval_expr_print(lval* v, char open, char close) {
 
 void lval_print(lval* v) {
     switch (v->type) {
-        case LVAL_NUM:   printf("%li", v->num); break; 
+        case LVAL_NUM:   printf("%f", v->num); break; 
         case LVAL_ERR:   printf("Error: %s", v->err); break; 
         case LVAL_SYM:   printf("%s", v->sym); break; 
         case LVAL_SEXPR: lval_expr_print(v, '(', ')'); break; 
@@ -165,6 +165,7 @@ lval* builtin_op(lval* a, char* op) {
         if (strcmp(op, "-") == 0) { x->num -= y->num; }
         if (strcmp(op, "*") == 0) { x->num *= y->num; }
         if (strcmp(op, "/") == 0) { if (y->num == 0) { lval_del(x); lval_del(y); x = lval_err("Division by zero!"); break;} x->num /= y->num; }
+        if (strcmp(op, "%") == 0) { x->num = x->num - (int)(x->num / y->num) * y->num; }
         lval_del(y);
     }
     lval_del(a); return x;    
@@ -189,8 +190,7 @@ lval* lval_eval(lval* v) {
     return v; 
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
     /* Create Some Parsers */
     mpc_parser_t* Number    = mpc_new("number");
     mpc_parser_t* Symbol    = mpc_new("symbol");
