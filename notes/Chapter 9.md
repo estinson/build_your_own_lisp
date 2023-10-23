@@ -206,5 +206,9 @@ Done. Had some trouble, turns out it was just placed after the `lval_del`. dope
 Done. Had to change `%` to modulo formula with int typecast to ensure correct math. 
 ### Resources
 [Conflicting types for function?](https://stackoverflow.com/questions/1549631/getting-conflicting-types-for-function-in-c-why) 
+<<<<<<< HEAD
 [Chapter 9](https://buildyourownlisp.com/chapter9_s_expressions) 
 [Modulo formula](https://math.stackexchange.com/questions/674419/is-there-a-formula-for-modulo)  
+=======
+[Chapter 9](https://buildyourownlisp.com/chapter9_s_expressions) 
+>>>>>>> 2a97680f6d3701805cf9b095f3e3bf968f061b77
